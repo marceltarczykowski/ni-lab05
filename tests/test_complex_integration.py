@@ -51,7 +51,7 @@ def test_apartment_costs_with_optional_parameters():
     assert costs == 3532.0
     
 def test_get_apartment_costs_no_apartment():
-    """Test sprawdza czy dla nieistniejącego mieszkania zwracane jest 0.0"""
+    """Test sprawdza czy dla nieistniejącego mieszkania zwracane jest None"""
     parameters = Parameters()
     manager = Manager(parameters)
     
