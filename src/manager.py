@@ -1,4 +1,4 @@
-from src.models import Apartment,ApartmentSettlement, Bill, Parameters, Tenant, Transfer
+from src.models import Apartment, ApartmentSettlement, Bill, Parameters, Tenant, TenantSettlement, Transfer
 
 
 class Manager:
@@ -63,4 +63,44 @@ class Manager:
             total_rent_pln=total_rent_pln,
             total_bills_pln=total_bills_pln,
             total_due_pln=total_due_pln
+        )
+
+    def create_tenant_settlement(self, tenant_key: str, year: int, month: int) -> TenantSettlement | None:
+        if tenant_key not in self.tenants:
+            return None
+        
+        tenant = self.tenants[tenant_key]
+        apartment_key = tenant.apartment
+        
+        total_rent_pln = sum(
+            t.rent_pln 
+            for t in self.tenants.values() 
+            if t.apartment == apartment_key
+        )
+        
+        total_bills_pln = self.get_apartment_costs(apartment_key, year, month) or 0.0
+        
+        bills_pln = (tenant.rent_pln / total_rent_pln) * total_bills_pln if total_rent_pln > 0 else 0.0
+        
+        total_due_pln = tenant.rent_pln - bills_pln
+        
+        transfers_sum = sum(
+            transfer.amount_pln
+            for transfer in self.transfers
+            if transfer.tenant == tenant_key
+            and transfer.settlement_year == year
+            and transfer.settlement_month == month
+        )
+        
+        balance_pln = transfers_sum - total_due_pln
+        
+        return TenantSettlement(
+            tenant=tenant_key,
+            apartment_settlement=apartment_key,
+            month=month,
+            year=year,
+            rent_pln=tenant.rent_pln,
+            bills_pln=bills_pln,
+            total_due_pln=total_due_pln,
+            balance_pln=balance_pln
         )
