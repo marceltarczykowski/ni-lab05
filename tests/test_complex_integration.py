@@ -56,7 +56,7 @@ def test_get_apartment_costs_no_apartment():
     manager = Manager(parameters)
     
     result = manager.get_apartment_costs('non-existent-apartment', 2024, 3)
-    assert result == 0.0
+    assert result is None
 
 
 def test_get_apartment_costs_no_bills_for_month():
